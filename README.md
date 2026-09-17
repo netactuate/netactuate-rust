@@ -1,28 +1,49 @@
-# netactuate-rust
+# nars
 
-Rust client for the NetActuate API, covering compute, networking, storage, DNS and managed
-Kubernetes.
+`nars` is the Rust SDK for NetActuate vAPI2 and vAPI3.
 
-This client is in active development and is not yet published. It is built to the same contract
-as the other NetActuate SDKs, so the calls it exposes match the Go, Python, PHP, TypeScript and
-Rust clients one for one.
+It currently covers the SDK foundation and these endpoint families:
 
-Once published, installation will be:
+- vAPI2: cloud servers, DNS zones and DNS records
+- vAPI3: VPCs, storage buckets and NKE clusters
 
-```bash
-cargo add netactuate
+## Install
+
+```toml
+[dependencies]
+nars = "0.1"
 ```
 
-## Status
+## Authenticate
 
-| | |
-| --- | --- |
-| Published | not yet |
-| Supersedes | the previous generation client under the `hostvirtual` organisation |
+Pass an API key explicitly or let the client read `NETACTUATE_API_KEY`.
 
-The Go client, [gona](https://github.com/netactuate/gona), is published and is the reference
-implementation for this one.
+```rust
+let v2 = nars::Client::from_env()?;
+let v3 = nars::V3Client::from_env()?;
+```
 
-## Documentation
+An empty base URL selects production. Use `with_base_url` to point at a test or staging API.
 
-Platform documentation and guides are at [netactuate.com/docs](https://netactuate.com/docs).
+```rust
+let v3 = nars::V3Client::with_base_url("api-key", "https://vapi3.example.test")?;
+```
+
+API keys are redacted from error messages and request display paths.
+
+## Two Clients
+
+vAPI2 and vAPI3 use different response envelopes, pagination and error shapes, so the SDK exposes two clients:
+
+- `Client` for vAPI2, production base `https://vapi2.netactuate.com/api/`
+- `V3Client` for vAPI3, production base `https://vapi3.netactuate.com`
+
+The method names follow the shared SDK contract in Rust style, for example `get_server`,
+`list_vpcs` and `get_nke_cluster`.
+
+## Features
+
+The default `blocking` feature enables the blocking reqwest transport. The `async` feature exposes
+async reqwest construction hooks for applications that use an async runtime.
+
+See https://netactuate.com/docs for platform documentation.

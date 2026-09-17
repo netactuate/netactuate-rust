@@ -1,0 +1,24 @@
+[package]
+name = "nars"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Rust SDK for the NetActuate vAPI2 and vAPI3 APIs"
+repository = "https://github.com/netactuate/nars"
+
+[features]
+default = ["blocking"]
+blocking = ["reqwest/blocking"]
+async = ["reqwest/json"]
+
+[dependencies]
+# rustls rather than the platform TLS stack, so a build needs no system OpenSSL. Without a TLS
+# feature reqwest cannot speak https at all and every call fails at the transport.
+reqwest = { version = "0.12.28", default-features = false, features = ["json", "rustls-tls"], optional = false }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+thiserror = "2.0.18"
+url = "2.5.8"
+futures-channel = "=0.3.33"
+futures-sink = "=0.3.33"
+futures-util = "=0.3.33"
