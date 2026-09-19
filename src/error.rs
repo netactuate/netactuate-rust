@@ -69,6 +69,11 @@ pub enum Error {
     #[error("decode error: {0}")]
     Decode(String),
 
+    /// A polling wait exceeded its configured timeout before the condition it was waiting on
+    /// was met.
+    #[error("timed out waiting: {0}")]
+    Timeout(String),
+
     /// JSON serialization or deserialization failed.
     #[error(transparent)]
     Json(#[from] serde_json::Error),
@@ -83,5 +88,10 @@ impl Error {
     /// Returns true when the error is a distinguishable contract gate response.
     pub fn is_contract(&self) -> bool {
         matches!(self, Self::Contract { .. })
+    }
+
+    /// Returns true when the error is a polling wait that exceeded its timeout.
+    pub fn is_timeout(&self) -> bool {
+        matches!(self, Self::Timeout(_))
     }
 }
