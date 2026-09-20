@@ -12,6 +12,24 @@ mod models;
 mod transport;
 mod v3;
 
+/// Builds a manual `Debug` impl for a struct that has one or more credential fields, showing
+/// those fields as the literal string "REDACTED" while every other field prints normally.
+///
+/// Usage: `redacted_debug!(StructName; normal_field_a, normal_field_b; secret_field_a, secret_field_b);`
+#[macro_export]
+macro_rules! redacted_debug {
+    ($t:ident; $($f:ident),* $(,)? ; $($s:ident),+ $(,)?) => {
+        impl ::std::fmt::Debug for $t {
+            fn fmt(&self, out: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                out.debug_struct(stringify!($t))
+                    $(.field(stringify!($f), &self.$f))*
+                    $(.field(stringify!($s), &"REDACTED"))*
+                    .finish()
+            }
+        }
+    };
+}
+
 pub use client::{
     AttemptSshRequest, BgpDashboardOptions, BindBgpGroupFirewallSetRequest, BindFirewallSetRequest,
     BuildServerRequest, BuyBgpPrefixesRequest, BuyBuildDedicatedServerRequest, Client,

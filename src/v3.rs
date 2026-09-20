@@ -3622,7 +3622,7 @@ pub struct UpdateVpcDnatRuleRequest {
 }
 
 /// Request body for creating an SSL certificate.
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Clone, Default, Serialize)]
 pub struct CreateSslCertificateRequest {
     /// Certificate name.
     pub name: String,
@@ -3636,8 +3636,15 @@ pub struct CreateSslCertificateRequest {
     pub private_key: String,
 }
 
+// credential fields omitted from Debug
+crate::redacted_debug!(
+    CreateSslCertificateRequest;
+    name, description, certificate;
+    private_key
+);
+
 /// Request body for updating an SSL certificate. Fields left empty are left unchanged.
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Clone, Default, Serialize)]
 pub struct UpdateSslCertificateRequest {
     /// Certificate name.
     #[serde(skip_serializing_if = "String::is_empty")]
@@ -3652,6 +3659,13 @@ pub struct UpdateSslCertificateRequest {
     #[serde(rename = "privateKey", skip_serializing_if = "String::is_empty")]
     pub private_key: String,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(
+    UpdateSslCertificateRequest;
+    name, description, certificate;
+    private_key
+);
 
 #[derive(Debug, Deserialize)]
 struct CreateSslCertificateResponse {
@@ -4161,7 +4175,7 @@ pub struct RouterVrfBgpAsn {
 }
 
 /// Request body for creating a BGP neighbor on a router VRF.
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Clone, Default, Serialize)]
 pub struct CreateRouterVrfBgpNeighborRequest {
     /// Neighbor address.
     pub address: String,
@@ -4202,8 +4216,16 @@ pub struct CreateRouterVrfBgpNeighborRequest {
     pub description: String,
 }
 
+// credential fields omitted from Debug
+crate::redacted_debug!(
+    CreateRouterVrfBgpNeighborRequest;
+    address, is_shutdown, do_as_override, do_next_help_self, source, enabled_ip_version,
+    ebgp_multihop, asn, import, export, name, description;
+    md5_secret
+);
+
 /// Request body for updating a BGP neighbor on a router VRF.
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Clone, Default, Serialize)]
 pub struct UpdateRouterVrfBgpNeighborRequest {
     /// Neighbor address.
     pub address: String,
@@ -4243,6 +4265,14 @@ pub struct UpdateRouterVrfBgpNeighborRequest {
     #[serde(skip_serializing_if = "String::is_empty")]
     pub description: String,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(
+    UpdateRouterVrfBgpNeighborRequest;
+    address, is_shutdown, do_as_override, do_next_help_self, source, enabled_ip_version,
+    ebgp_multihop, asn, import, export, name, description;
+    md5_secret
+);
 
 #[derive(Debug, Deserialize)]
 struct RouterVrfBgpNeighborIdResponse {
@@ -4465,7 +4495,7 @@ struct RouterVrfInterfaceIdResponse {
 }
 
 /// Request body for creating a wireguard peer on a router VRF interface.
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Clone, Default, Serialize)]
 pub struct CreateRouterVrfInterfaceWireguardPeerRequest {
     /// Networks routed to this peer.
     #[serde(rename = "allowedIps")]
@@ -4483,6 +4513,13 @@ pub struct CreateRouterVrfInterfaceWireguardPeerRequest {
     /// Peer's remote endpoint address.
     pub remote: Option<String>,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(
+    CreateRouterVrfInterfaceWireguardPeerRequest;
+    allowed_ips, public_key, name, description, remote;
+    pre_shared_key
+);
 
 #[derive(Debug, Deserialize)]
 struct RouterVrfInterfaceWireguardPeerIdResponse {

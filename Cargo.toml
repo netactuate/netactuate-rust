@@ -1,6 +1,6 @@
 [package]
 name = "nars"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 description = "Rust SDK for the NetActuate vAPI2 and vAPI3 APIs"

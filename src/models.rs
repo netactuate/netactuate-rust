@@ -766,13 +766,16 @@ pub struct StorageBucketMetadata {
 }
 
 /// Storage bucket, decoded from both flat list rows and nested single-get responses.
-#[derive(Debug, Clone, Serialize, PartialEq, Eq, Default)]
+#[derive(Clone, Serialize, PartialEq, Eq, Default)]
 pub struct StorageBucket {
     /// Credentials present on single get responses.
     pub credentials: StorageS3Credentials,
     /// Bucket metadata.
     pub metadata: StorageBucketMetadata,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(StorageBucket; metadata; credentials);
 
 impl<'de> Deserialize<'de> for StorageBucket {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
@@ -886,13 +889,16 @@ pub struct StorageObjectStoreMetadata {
 }
 
 /// Object store, decoded from both flat list rows and nested single-get responses.
-#[derive(Debug, Clone, Serialize, PartialEq, Eq, Default)]
+#[derive(Clone, Serialize, PartialEq, Eq, Default)]
 pub struct StorageObjectStore {
     /// Credentials present on single get responses.
     pub credentials: StorageS3Credentials,
     /// Object store metadata.
     pub metadata: StorageObjectStoreMetadata,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(StorageObjectStore; metadata; credentials);
 
 impl<'de> Deserialize<'de> for StorageObjectStore {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
@@ -956,13 +962,16 @@ pub struct StorageBlockNamespaceMetadata {
 }
 
 /// Block storage namespace, decoded from both flat list rows and nested single-get responses.
-#[derive(Debug, Clone, Serialize, PartialEq, Eq, Default)]
+#[derive(Clone, Serialize, PartialEq, Eq, Default)]
 pub struct StorageBlockNamespace {
     /// Credentials present on single get responses.
     pub credentials: StorageBlockCredentials,
     /// Namespace metadata.
     pub metadata: StorageBlockNamespaceMetadata,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(StorageBlockNamespace; metadata; credentials);
 
 impl<'de> Deserialize<'de> for StorageBlockNamespace {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
@@ -1031,13 +1040,16 @@ pub struct StorageBlockVolumeMetadata {
 /// no `blockVolumeId`. This type decodes leniently rather than rejecting that shape, because
 /// recovering the id is the job of the caller that knows which id it asked for; see
 /// `V3Client::get_storage_block_volume`.
-#[derive(Debug, Clone, Serialize, PartialEq, Eq, Default)]
+#[derive(Clone, Serialize, PartialEq, Eq, Default)]
 pub struct StorageBlockVolume {
     /// Credentials present on single get responses.
     pub credentials: StorageBlockCredentials,
     /// Volume metadata.
     pub metadata: StorageBlockVolumeMetadata,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(StorageBlockVolume; metadata; credentials);
 
 impl<'de> Deserialize<'de> for StorageBlockVolume {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
@@ -4063,7 +4075,7 @@ pub struct BgpNeighborRouteMap {
 }
 
 /// A BGP neighbor configured on a router VRF.
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Default)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq, Default)]
 pub struct RouterVrfBgpNeighbor {
     /// Neighbor id.
     #[serde(default, rename = "neighborId")]
@@ -4108,6 +4120,14 @@ pub struct RouterVrfBgpNeighbor {
     #[serde(default)]
     pub description: String,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(
+    RouterVrfBgpNeighbor;
+    neighbor_id, address, is_shutdown, do_as_override, do_next_help_self, source,
+    enabled_ip_version, ebgp_multihop, asn, import, export, name, description;
+    md5_secret
+);
 
 /// A static route configured on a router VRF.
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Default)]
@@ -4302,7 +4322,7 @@ pub struct WireguardPeerAllowedIp {
 }
 
 /// A wireguard peer configured on a router VRF interface.
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Default)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq, Default)]
 pub struct RouterVrfInterfaceWireguardPeer {
     /// Peer id.
     #[serde(default, rename = "wireguardPeerId")]
@@ -4329,6 +4349,13 @@ pub struct RouterVrfInterfaceWireguardPeer {
     #[serde(default)]
     pub description: Option<String>,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(
+    RouterVrfInterfaceWireguardPeer;
+    wireguard_peer_id, allowed_ips, public_key, remote, name, description;
+    private_key, pre_shared_key
+);
 
 /// An interface configured on a router VRF.
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Default)]
@@ -5505,7 +5532,7 @@ pub struct BgpSessionPrefix {
 
 /// A BGP session, as returned by [`crate::Client::get_bgp_session`] and
 /// [`crate::Client::list_bgp_sessions`].
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Default)]
 pub struct BgpSession {
     /// Session id.
     #[serde(default)]
@@ -5574,6 +5601,15 @@ pub struct BgpSession {
     #[serde(default, deserialize_with = "flexible_int")]
     pub customer_asn: i64,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(
+    BgpSession;
+    id, customer_peer_ip, group_id, locked, description, state, routes_received, last_update,
+    config_status, prefixes, export_list, community, provider_peer_ip, location, latitude,
+    longitude, group_name, provider_ip_type, provider_asn, customer_asn;
+    password
+);
 
 impl BgpSession {
     /// Reports whether the session is currently locked against changes.
@@ -5796,7 +5832,7 @@ pub struct Package {
 }
 
 /// Request body for canceling a cloud package.
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Clone, Default, Serialize)]
 pub struct CancelPackageRequest {
     /// Billing package id to cancel.
     pub mbpkgid: i64,
@@ -5814,6 +5850,13 @@ pub struct CancelPackageRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub password: Option<String>,
 }
+
+// credential fields omitted from Debug
+crate::redacted_debug!(
+    CancelPackageRequest;
+    mbpkgid, domu_package, comments, cancel_type, agree;
+    password
+);
 
 // --- Longtail ---
 
@@ -6073,5 +6116,38 @@ mod domain_parity_tests {
         assert_eq!(decoded.ip, "203.0.113.5");
         assert_eq!(decoded.location, "chi");
         assert_eq!(decoded.raw["extra"], "kept");
+    }
+
+    #[test]
+    fn wireguard_peer_debug_redacts_keys_but_keeps_other_fields() {
+        let peer = RouterVrfInterfaceWireguardPeer {
+            wireguard_peer_id: 42,
+            private_key: "fake-private-key-value".to_string(),
+            pre_shared_key: Some("fake-pre-shared-key-value".to_string()),
+            public_key: "fake-public-key-value".to_string(),
+            name: Some("peer-name".to_string()),
+            ..Default::default()
+        };
+        let debugged = format!("{:?}", peer);
+        assert!(!debugged.contains("fake-private-key-value"));
+        assert!(!debugged.contains("fake-pre-shared-key-value"));
+        assert!(debugged.contains("REDACTED"));
+        assert!(debugged.contains("fake-public-key-value"));
+        assert!(debugged.contains("peer-name"));
+        assert!(debugged.contains("42"));
+    }
+
+    #[test]
+    fn secret_list_value_debug_is_not_over_redacted() {
+        let value = SecretListValue {
+            id: 1,
+            secret_list_id: 2,
+            secret_key: "fake-secret-key".to_string(),
+            secret_value: "fake-secret-value".to_string(),
+        };
+        let debugged = format!("{:?}", value);
+        assert!(debugged.contains("fake-secret-key"));
+        assert!(debugged.contains("fake-secret-value"));
+        assert!(!debugged.contains("REDACTED"));
     }
 }

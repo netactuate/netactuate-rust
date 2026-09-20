@@ -31,7 +31,7 @@ impl Method {
 }
 
 /// A complete HTTP request handed to a transport.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Request {
     /// HTTP method.
     pub method: Method,
@@ -43,13 +43,39 @@ pub struct Request {
     pub content_type: Option<String>,
 }
 
+// Manual Debug: the url carries the API key as a query parameter and the body
+// can carry a secret value, so a derived Debug would leak both whenever a
+// Request is formatted with {:?} or logged. Redact the key and summarise the
+// body by length.
+impl std::fmt::Debug for Request {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Request")
+            .field("method", &self.method)
+            .field("url", &redact_url(&self.url))
+            .field("body", &self.body.as_ref().map(|b| format!("{} bytes", b.len())))
+            .field("content_type", &self.content_type)
+            .finish()
+    }
+}
+
 /// HTTP response returned by a transport.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Response {
     /// HTTP status code.
     pub status: u16,
     /// Response body bytes.
     pub body: Vec<u8>,
+}
+
+// Manual Debug: a response body can carry secret values in cleartext, so a
+// derived Debug would leak them. Summarise the body by length.
+impl std::fmt::Debug for Response {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Response")
+            .field("status", &self.status)
+            .field("body", &format!("{} bytes", self.body.len()))
+            .finish()
+    }
 }
 
 /// Blocking transport used by the SDK clients.
@@ -159,4 +185,30 @@ pub(crate) fn build_url(base: &Url, path: &str, api_key: &str) -> Result<Url> {
     let mut url = base.join(path.trim_start_matches('/'))?;
     url.query_pairs_mut().append_pair("key", api_key);
     Ok(url)
+}
+
+#[cfg(test)]
+mod debug_redaction_tests {
+    use super::*;
+    use url::Url;
+
+    #[test]
+    fn request_debug_redacts_api_key() {
+        let url = Url::parse("https://vapi2.netactuate.com/api/servers?key=SUPERSECRETKEY").unwrap();
+        let req = Request {
+            method: Method::Get,
+            url,
+            body: Some(b"payload".to_vec()),
+            content_type: None,
+        };
+        let rendered = format!("{:?}", req);
+        assert!(!rendered.contains("SUPERSECRETKEY"), "api key leaked in Request Debug: {rendered}");
+    }
+
+    #[test]
+    fn response_debug_omits_body_bytes() {
+        let resp = Response { status: 200, body: b"secret-value-in-body".to_vec() };
+        let rendered = format!("{:?}", resp);
+        assert!(!rendered.contains("secret-value-in-body"), "response body leaked in Debug: {rendered}");
+    }
 }
